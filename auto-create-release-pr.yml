@@ -1,0 +1,53 @@
+name: Auto create release PR
+
+on:
+    # schedule:
+    #     - cron: "0 05 * * FRI" #12:00 every Friday GMT+7
+    push:
+        branches:
+            - release/202**
+
+jobs:
+    generate-release-branch:
+        runs-on: ubuntu-latest
+        name: Release branch for this week
+        outputs:
+            release-branch: ${{ steps.create-build-branch.outputs.branch }}
+        steps:
+            - name: Create branch
+              id: create-build-branch
+              run: |
+                  if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] 
+                  then
+                    echo "::set-output name=branch::${{ github.event.inputs.release-branch }}"
+                  else
+                    echo "$(date -d 'next Wednesday' '+%Y%m%d')"
+                    echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
+                  fi
+
+    create-pull-request-from-release-branch:
+        runs-on: ubuntu-latest
+        name: Create Release PR
+        needs: [generate-release-branch]
+        if: ${{ !contains(github.event.pull_request.title, ${{needs.generate-release-branch.outputs.release-branch}}) }
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@master
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+                  ref: "${{ needs.generate-release-branch.outputs.release-branch }}"
+
+            - name: Create Pull Request
+              id: cpr
+              uses: repo-sync/pull-request@v2
+              with:
+                  source_branch: "${{ needs.generate-release-branch.outputs.release-branch }}"
+                  destination_branch: "develop"
+                  pr_title: "[${{ github.event.inputs.jira-ticket-id }}] Release PR ${{needs.generate-release-branch.outputs.release-branch}}" # Title of pull request
+                  pr_body: "This PR is auto-generated for this week ${{needs.generate-release-branch.outputs.release-branch}}" # Full markdown support, requires pr_title to be set
+                  pr_label: "release,automated,Ok to test" # Comma-separated list (no spaces)
+                  pr_draft: true # Creates pull request as draft
+                  pr_allow_empty: true # Creates pull request even if there are no changes
+
+            
