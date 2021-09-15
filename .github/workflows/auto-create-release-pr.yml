@@ -32,7 +32,6 @@ jobs:
         name: Create Release PR
         needs: [generate-release-branch]
         if: ${{ contains(github.event.pull_request.base.ref, needs.generate-release-branch.outputs.release-branch) }
-
         steps:
             - name: Checkout Repo
               uses: actions/checkout@master
