@@ -15,7 +15,7 @@ jobs:
         if: github.event.pull_request.merged == 'true'
         outputs:
             ts: ${{ steps.changes.outputs.ts }}
-        
+            current_release_branch: ${{ steps.current_release_branch.outputs.branch_name }}
         steps:
         - name: Checkout repository
           uses: actions/checkout@v2
