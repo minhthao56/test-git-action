@@ -50,13 +50,12 @@ jobs:
               echo "${{needs.create-release-branch.outputs.current_release_branch}}"
               git checkout develop
               echo "::set-output name=dev::$(git rev-list --count develop)"
-              git checkout '${{needs.create-release-branch.outputs.current_release_branch}}'
-              echo "::set-output name=release::$(git rev-list --count needs.create-release-branch.outputs.current_release_branch)"
+              git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
+              echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
 
     generate-release-branch:
         runs-on: ubuntu-latest
         needs: get-commit-dev-release
-        if: ${{!needs.changedfiles.outputs.ts}}
         name: Release branch for this week
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
@@ -71,8 +70,8 @@ jobs:
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
                     echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
                   fi
-
-                  echo "${{needs.create-release-branch.outputs.current_release_branch}}"
+                  echo "${{needs.get-commit-dev-release.outputs.number_commit_dev}}"
+                  echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
 
 
     create-pull-request-from-release-branch:
