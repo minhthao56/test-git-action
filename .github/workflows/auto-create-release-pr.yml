@@ -14,7 +14,6 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == 'true'
         outputs:
-            all: ${{ steps.changes.outputs.all}}
             ts: ${{ steps.changes.outputs.ts }}
         steps:
         - name: Checkout repository
@@ -22,7 +21,6 @@ jobs:
         - name: Get changed files
           id: changes
           run: |
-            echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
             echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
 
     generate-release-branch:
