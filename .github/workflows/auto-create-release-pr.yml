@@ -34,9 +34,8 @@ jobs:
           id: changes
           run: |
             set -e
-            source_branch=${{ github.head_ref }} #source branch
             current_release_branch=${{ steps.current_release_branch.outputs.branch_name }}
-            echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ source_branch }} ${{ current_release_branch }} | grep .ts$ | xargs)"
+            echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ github.head_ref }} ${{ current_release_branch }} | grep .ts$ | xargs)"
 
     generate-release-branch:
         runs-on: ubuntu-latest
