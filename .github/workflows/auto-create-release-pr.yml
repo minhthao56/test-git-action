@@ -71,6 +71,10 @@ jobs:
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
                     echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
                   fi
+                  echo "${{needs.get-commit-dev-release.number_commit_dev}}"
+                  echo "${{needs.get-commit-dev-release.number_commit_release}}"
+
+
 
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
