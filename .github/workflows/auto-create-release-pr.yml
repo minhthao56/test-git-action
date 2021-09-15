@@ -10,7 +10,7 @@ on:
             - closed
 
 jobs:
-    get-release-branch:
+    create-release-branch:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == true
 
@@ -32,7 +32,7 @@ jobs:
     
     get-commit-dev-release:
         runs-on: ubuntu-latest
-        needs: [get-release-branch]
+        needs: [create-release-branch]
         outputs:
             number_commit_dev: ${{ steps.count_commit.outputs.dev }}
             number_commit_release: ${{ steps.count_commit.outputs.release }}
@@ -47,11 +47,11 @@ jobs:
             id: count_commit
             run: |
               set -e
-              echo "${{needs.get-release-branch.outputs.current_release_branch}}"
+              echo "${{needs.create-release-branch.outputs.current_release_branch}}"
               git checkout develop
               echo "::set-output name=dev::$(git rev-list --count develop)"
-              git checkout ${{needs.get-release-branch.outputs.current_release_branch}}
-              echo "::set-output name=release::$(git rev-list --count ${{needs.get-release-branch.outputs.current_release_branch}})"
+              git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
+              echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
 
     generate-release-branch:
         runs-on: ubuntu-latest
@@ -73,6 +73,7 @@ jobs:
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_dev}}"
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
 
+                  
 
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
