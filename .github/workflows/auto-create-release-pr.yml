@@ -3,9 +3,11 @@ name: Auto create release PR
 on:
     # schedule:
     #     - cron: "0 05 * * FRI" #12:00 every Friday GMT+7
-    push:
+    pull_request:
         branches:
             - release/202**
+        types:
+            - closed
 
 jobs:
     generate-release-branch:
@@ -29,7 +31,8 @@ jobs:
         runs-on: ubuntu-latest
         name: Create Release PR
         needs: [generate-release-branch]
-        if: ${{ !contains(github.event.pull_request.title, needs.generate-release-branch.outputs.release-branch) }}
+        if: ${{ contains(github.event.pull_request.base.ref, needs.generate-release-branch.outputs.release-branch) }
+
         steps:
             - name: Checkout Repo
               uses: actions/checkout@master
