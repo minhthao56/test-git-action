@@ -12,6 +12,8 @@ on:
 jobs:
     create-release-branch:
         runs-on: ubuntu-latest
+        name: Get current release branch
+
         if: github.event.pull_request.merged == true
 
         outputs:
@@ -32,7 +34,9 @@ jobs:
     
     get-commit-dev-release:
         runs-on: ubuntu-latest
+        name: Get number commit on dev and release branch
         needs: [create-release-branch]
+        
         outputs:
             number_commit_dev: ${{ steps.count_commit.outputs.dev }}
             number_commit_release: ${{ steps.count_commit.outputs.release }}
@@ -73,7 +77,7 @@ jobs:
                   fi
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_dev}}"
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
-                  
+
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
         name: Create Release PR
