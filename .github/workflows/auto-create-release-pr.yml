@@ -19,6 +19,9 @@ jobs:
         steps:
         - name: Checkout repository
           uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+
         - name: Get current release branch
           id: current_release_branch
           run: |
