@@ -67,7 +67,7 @@ jobs:
         runs-on: ubuntu-latest
         needs: get-commit-dev-release
         name: Release branch for this week
-        if: needs.get-commit-dev-release.outputs.number_commit_dev == needs.get-commit-dev-release.outputs.number_commit_release
+        # if: needs.get-commit-dev-release.outputs.number_commit_dev == needs.get-commit-dev-release.outputs.number_commit_release
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
