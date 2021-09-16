@@ -76,7 +76,7 @@ jobs:
                 echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
                 echo "${{needs.get-commit-dev-release.outputs.number_commit_feature}}"
 
-                echo "::set-output name=before-commit::$( ${{needs.get-commit-dev-release.outputs.number_commit_release}}-${{needs.get-commit-dev-release.outputs.number_commit_feature}} )"
+                echo "::set-output name=before-commit::$( expr ${{needs.get-commit-dev-release.outputs.number_commit_release}} - ${{needs.get-commit-dev-release.outputs.number_commit_feature}} )"
           
 
     generate-release-branch:
