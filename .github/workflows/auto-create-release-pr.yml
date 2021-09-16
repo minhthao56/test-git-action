@@ -62,7 +62,7 @@ jobs:
 
               git checkout ${{ github.sha }}
               number_feature=git rev-list --count develop..${{github.sha}}
-              echo "${{number_commit_feature}}"
+              echo "${{number_feature}}"
               echo "::set-output name=feature::$(${{number_release}}-${{number_feature}})"
                  
         
