@@ -47,6 +47,7 @@ jobs:
               git checkout develop        
               git checkout -b feature ${{ github.event.pull_request.base.sha }}
               echo "::set-output name=feature::$(git rev-list --count develop..feature)"
+              git log
         
     generate-release-branch:
         runs-on: ubuntu-latest
