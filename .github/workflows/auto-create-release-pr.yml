@@ -1,40 +1,19 @@
 name: Auto create release PR
 
 on:
-    # schedule:
-    #     - cron: "0 05 * * FRI" #12:00 every Friday GMT+7
     pull_request:
         branches:
             - release/202**
         types:
             - closed
 
-jobs:
-    create-release-branch:
-        runs-on: ubuntu-latest
-        name: Get current release branch
-        if: github.event.pull_request.merged == true
-        outputs:
-            current_release_branch: ${{ steps.current_release_branch.outputs.branch_name }}
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-
-        
-        - name: Get current release branch
-          id: current_release_branch
-          run: |
-            set -e
-            echo "::set-output name=branch_name::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
-    
+jobs:  
     get-commit-dev-release:
         runs-on: ubuntu-latest
         name: Get number commit on dev and release branch
         needs: [create-release-branch]
         outputs:
-            number_commit_feature_diff: ${{ steps.count_commit.outputs.feature }}
+            number_commit_diff: ${{ steps.count_commit.outputs.diff }}
         steps:
           - name: Checkout repository
             uses: actions/checkout@v2
@@ -45,15 +24,15 @@ jobs:
             run: |
               set -e
               git checkout develop        
-              git checkout -b feature ${{ github.event.pull_request.base.sha }}
-              echo "::set-output name=feature::$(git rev-list --count develop..feature)"
+              git checkout -b release ${{ github.event.pull_request.base.sha }}
+              echo "::set-output name=diff::$(git rev-list --count develop..release)"
               git log
         
     generate-release-branch:
         runs-on: ubuntu-latest
         needs: [get-commit-dev-release]
         name: Release branch for this week
-        if: needs.get-commit-dev-release.outputs.number_commit_feature_diff == 0
+        if: needs.get-commit-dev-release.outputs.number_commit_diff == 0
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
