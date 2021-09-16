@@ -8,7 +8,7 @@ on:
             - closed
 
 jobs:  
-    get-commit-dev-release:
+    get-commit-diff:
         runs-on: ubuntu-latest
         name: Get number commit on dev and release branch
         outputs:
@@ -23,15 +23,15 @@ jobs:
             run: |
               set -e
               git checkout develop        
-              git checkout -b release ${{ github.event.pull_request.base.sha }}
-              echo "::set-output name=diff::$(git rev-list --count develop..release)"
+              git checkout -b new-branch ${{ github.event.pull_request.base.sha }}
+              echo "::set-output name=diff::$(git rev-list --count develop..new-branch)"
               git log
         
     generate-release-branch:
         runs-on: ubuntu-latest
-        needs: [get-commit-dev-release]
+        needs: [get-commit-diff]
         name: Release branch for this week
-        if: needs.get-commit-dev-release.outputs.number_commit_diff == 0
+        if: needs.get-commit-diff.outputs.number_commit_diff == 0
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
