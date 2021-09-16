@@ -13,12 +13,9 @@ jobs:
     create-release-branch:
         runs-on: ubuntu-latest
         name: Get current release branch
-
         if: github.event.pull_request.merged == true
-
         outputs:
             current_release_branch: ${{ steps.current_release_branch.outputs.branch_name }}
-
         steps:
         - name: Checkout repository
           uses: actions/checkout@v2
@@ -36,13 +33,10 @@ jobs:
         runs-on: ubuntu-latest
         name: Get number commit on dev and release branch
         needs: [create-release-branch]
-        
         outputs:
             number_commit_dev: ${{ steps.count_commit.outputs.dev }}
             number_commit_release: ${{ steps.count_commit.outputs.release }}
             number_commit_feature: ${{ steps.count_commit.outputs.feature }}
-
-
         steps:
           - name: Checkout repository
             uses: actions/checkout@v2
@@ -73,9 +67,6 @@ jobs:
             id: calu_commit
             run: |
                 set -e
-                echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
-                echo "${{needs.get-commit-dev-release.outputs.number_commit_feature}}"
-
                 echo "::set-output name=before-commit::$( expr ${{needs.get-commit-dev-release.outputs.number_commit_release}} - ${{needs.get-commit-dev-release.outputs.number_commit_feature}} )"
           
 
@@ -83,7 +74,7 @@ jobs:
         runs-on: ubuntu-latest
         needs: [get-commit-dev-release, calc-commit-before-merge-release]
         name: Release branch for this week
-        # if: needs.get-commit-dev-release.outputs.number_commit_dev == needs.get-commit-dev-release.outputs.number_commit_release
+        if: needs.get-commit-dev-release.outputs.number_commit_dev == needs.calc-commit-before-merge-release.outputs.number_commit_before_merge
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
@@ -97,12 +88,6 @@ jobs:
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
                     echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
                   fi
-                  echo "${{needs.get-commit-dev-release.outputs.number_commit_dev}}"
-                  echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
-                  echo "${{needs.get-commit-dev-release.outputs.number_commit_feature}}"
-                  echo "${{needs.calc-commit-before-merge-release.outputs.number_commit_before_merge}}"
-
-
 
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
