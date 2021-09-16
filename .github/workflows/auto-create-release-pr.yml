@@ -43,7 +43,8 @@ jobs:
           - name: Get number commit on dev and release
             id: count_commit
             run: |
-              set -e              
+              set -e
+              git checkout develop        
               git checkout -b feature ${{ github.event.pull_request.base.sha }}
               echo "::set-output name=feature::$(git rev-list --count develop..feature)"
         
