@@ -57,15 +57,28 @@ jobs:
               echo "::set-output name=dev::$(git rev-list --count develop)"
 
               git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
-              number_release=git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}}
-              echo "::set-output name=release::$(number_release)"
+              echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
 
               git checkout ${{ github.sha }}
-              number_feature=git rev-list --count develop..${{github.sha}}
-              echo "${{number_feature}}"
-              echo "::set-output name=feature::$(${{number_release}}-${{number_feature}})"
-                 
+              echo "::set-output name=feature::$(git rev-list --count develop..${{github.sha}})"
         
+    calc-commit-before-merge-release:
+        runs-on: ubuntu-latest
+        name: Calc number commit before merge on release branch
+        needs: [get-commit-dev-release]
+        outputs:
+           number_commit_before_merge: ${{ steps.calu_commit.outputs.before-commit }}
+        steps:
+          - name: Calu number commit before merge
+            id: calu_commit
+            run: |
+                set -e
+                echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
+                echo "${{needs.get-commit-dev-release.outputs.number_commit_feature}}"
+
+                echo "::set-output name=before-commit::$( ${{needs.get-commit-dev-release.outputs.number_commit_release}}-${{needs.get-commit-dev-release.outputs.number_commit_feature}} )"
+          
+
     generate-release-branch:
         runs-on: ubuntu-latest
         needs: [get-commit-dev-release, calc-commit-before-merge-release]
@@ -87,6 +100,7 @@ jobs:
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_dev}}"
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_release}}"
                   echo "${{needs.get-commit-dev-release.outputs.number_commit_feature}}"
+                  echo "${{needs.calc-commit-before-merge-release.outputs.number_commit_before_merge}}"
 
 
 
