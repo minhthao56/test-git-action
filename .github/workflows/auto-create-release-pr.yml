@@ -53,11 +53,11 @@ jobs:
               git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
               echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
 
-              git checkout HEAD@{1}
-              echo "::set-output name=feature::$(git rev-list --count develop..HEAD@{1})"
-              git reflog
-              echo "${{github.head_ref}}"
-              echo "${{git rev-list --count develop..${{github.head_ref}}}}"
+              git checkout -b feature ${{ github.event.pull_request.base.sha }}
+              echo "::set-output name=feature::$(git rev-list --count develop..feature)"
+
+              git log
+
 
         
     calc-commit-before-merge-release:
