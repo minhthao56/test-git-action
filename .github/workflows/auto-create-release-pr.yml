@@ -53,8 +53,8 @@ jobs:
               git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
               echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
 
-              git checkout ${{ github.sha }}
-              echo "::set-output name=feature::$(git rev-list --count develop..${{github.sha}})"
+              git checkout ${{ github.event.pull_request.base.sha }}
+              echo "::set-output name=feature::$(git rev-list --count develop..${{github.event.pull_request.base.sha}})"
         
     calc-commit-before-merge-release:
         runs-on: ubuntu-latest
