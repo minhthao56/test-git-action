@@ -25,7 +25,6 @@ jobs:
               git checkout develop        
               git checkout -b new-branch ${{ github.event.pull_request.base.sha }}
               echo "::set-output name=diff::$(git rev-list --count develop..new-branch)"
-              git log
         
     generate-release-branch:
         runs-on: ubuntu-latest
