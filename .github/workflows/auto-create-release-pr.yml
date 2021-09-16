@@ -11,7 +11,6 @@ jobs:
     get-commit-dev-release:
         runs-on: ubuntu-latest
         name: Get number commit on dev and release branch
-        needs: [create-release-branch]
         outputs:
             number_commit_diff: ${{ steps.count_commit.outputs.diff }}
         steps:
