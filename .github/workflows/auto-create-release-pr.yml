@@ -57,7 +57,6 @@ jobs:
               echo "::set-output name=feature::$(git rev-list --count develop..feature)"
 
               git log
-              git reflog
 
 
         
