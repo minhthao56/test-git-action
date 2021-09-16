@@ -56,7 +56,8 @@ jobs:
               echo "::set-output name=dev::$(git rev-list --count develop)"
               git checkout ${{needs.create-release-branch.outputs.current_release_branch}}
               echo "::set-output name=release::$(git rev-list --count ${{needs.create-release-branch.outputs.current_release_branch}})"
-              git checkout ${{ github.head_ref }}
+              git checkout ${{ github.sha }}
+
 
     generate-release-branch:
         runs-on: ubuntu-latest
