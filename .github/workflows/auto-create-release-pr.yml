@@ -56,8 +56,6 @@ jobs:
               git checkout HEAD@{1}
               echo "::set-output name=feature::$(git rev-list --count develop..HEAD@{1})"
               git reflog
-              echo "${{github.head_ref}}"
-              git rev-list --count develop..${{github.head_ref}}
 
         
     calc-commit-before-merge-release:
