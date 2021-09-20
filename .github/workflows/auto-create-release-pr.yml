@@ -46,7 +46,7 @@ jobs:
                     echo "::set-output name=branch::${{ github.event.inputs.release-branch }}"
                   else
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
-                    echo "::set-output name=branch::${{github.base_ref}}"
+                    echo "::set-output name=branch::${{github.base_ref}} "
                   fi
 
     create-pull-request-from-release-branch:
@@ -60,9 +60,11 @@ jobs:
                   fetch-depth: 0
                   persist-credentials: false
                   ref: "${{ needs.generate-release-branch.outputs.release-branch }}"
-              run: |
-                    echo ${{ needs.generate-release-branch.outputs.release-branch }}
 
+            - name: Check
+              run: |
+                    echo ${{needs.generate-release-branch.outputs.release-branch}} 
+            
             - name: Create Pull Request
               id: cpr
               uses: repo-sync/pull-request@v2
