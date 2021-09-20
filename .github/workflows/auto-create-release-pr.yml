@@ -40,13 +40,13 @@ jobs:
             - name: Create branch
               id: create-build-branch
               run: |
+                  echo ${{github.event.pull_request.base_ref}} 
                   if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] 
                   then
                     echo "::set-output name=branch::${{ github.event.inputs.release-branch }}"
                   else
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
                     echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
-                    github.event.pull_request.base_ref
                   fi
 
     create-pull-request-from-release-branch:
