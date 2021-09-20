@@ -33,7 +33,7 @@ jobs:
         runs-on: ubuntu-latest
         needs: [get-commit-diff]
         name: Release branch for this week
-        if: needs.get-commit-diff.outputs.number_commit_diff == 0
+        # if: needs.get-commit-diff.outputs.number_commit_diff == 0
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
@@ -46,6 +46,7 @@ jobs:
                   else
                     echo "$(date -d 'next Wednesday' '+%Y%m%d')"
                     echo "::set-output name=branch::release/$(date -d 'next Wednesday' '+%Y%m%d')"
+                    github.event.pull_request.base_ref
                   fi
 
     create-pull-request-from-release-branch:
