@@ -40,7 +40,7 @@ jobs:
             - name: Create branch
               id: create-build-branch
               run: |
-                  echo ${{github.event.pull_request.base_ref}} 
+                  echo ${{github.base_ref}} 
                   if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] 
                   then
                     echo "::set-output name=branch::${{ github.event.inputs.release-branch }}"
