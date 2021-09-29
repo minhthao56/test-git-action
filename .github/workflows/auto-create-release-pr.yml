@@ -13,7 +13,7 @@ jobs:
         name: Get number commit on dev and release branch
         outputs:
             number_commit_diff: ${{ steps.count_commit.outputs.diff }}
-            current_release_branch: ${{ steps.current_release_branch.outputs.branch_name }}
+            current_release_branch: ${{ steps.current_release_branchs.outputs.current_branch }}
         steps:
           - name: Checkout repository
             uses: actions/checkout@v2
@@ -34,10 +34,7 @@ jobs:
             id: current_release_branchs
             run: |
                 set -e
-                echo "::set-output name=branch_name::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
-
-                git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-
-                echo ${{github.base_ref}}
+                echo "::set-output name=current_branch::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
         
     generate-release-branch:
         runs-on: ubuntu-latest
@@ -57,6 +54,7 @@ jobs:
                   else
                     echo "::set-output name=branch::${{github.base_ref}}"
                   fi
+
 
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
