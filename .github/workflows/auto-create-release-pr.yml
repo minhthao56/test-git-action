@@ -35,6 +35,9 @@ jobs:
             run: |
                 set -e
                 echo "::set-output name=branch_name::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
+
+                git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-
+                github.base_ref
         
     generate-release-branch:
         runs-on: ubuntu-latest
