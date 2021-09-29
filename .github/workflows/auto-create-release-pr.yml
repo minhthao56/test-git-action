@@ -13,6 +13,7 @@ jobs:
         name: Get number commit on dev and release branch
         outputs:
             number_commit_diff: ${{ steps.count_commit.outputs.diff }}
+            current_release_branch: ${{ steps.current_release_branch.outputs.branch_name }}
         steps:
           - name: Checkout repository
             uses: actions/checkout@v2
@@ -28,12 +29,18 @@ jobs:
 
               echo commit_diff:
               git rev-list --count develop..new-branch
+          
+          - name: Get current release branch
+            id: current_release_branchs
+            run: |
+                set -e
+                echo "::set-output name=branch_name::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
         
     generate-release-branch:
         runs-on: ubuntu-latest
         needs: [get-commit-diff]
         name: Release branch for this week
-        if: needs.get-commit-diff.outputs.number_commit_diff == 0
+        if: (needs.get-commit-diff.outputs.number_commit_diff == 0) && (needs.get-commit-diff.outputs.current_release_branch == github.base_ref)
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
