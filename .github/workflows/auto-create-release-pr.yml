@@ -43,7 +43,8 @@ jobs:
         runs-on: ubuntu-latest
         needs: [get-commit-diff]
         name: Release branch for this week
-        if: (needs.get-commit-diff.outputs.number_commit_diff == 0) && (needs.get-commit-diff.outputs.current_release_branch == github.base_ref)
+        if: ${{ needs.get-commit-diff.outputs.number_commit_diff == 0 && github.base_ref == needs.get-commit-diff.outputs.current_release_branch}}
+
         outputs:
             release-branch: ${{ steps.create-build-branch.outputs.branch }}
         steps:
