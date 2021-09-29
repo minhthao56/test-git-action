@@ -35,38 +35,22 @@ jobs:
             run: |
                 set -e
                 echo "::set-output name=current_branch::$(git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-)"
-        
-    generate-release-branch:
-        runs-on: ubuntu-latest
-        needs: [get-commit-diff]
-        name: Release branch for this week
-        if: ${{ needs.get-commit-diff.outputs.number_commit_diff == 0 && github.base_ref == needs.get-commit-diff.outputs.current_release_branch}}
 
-        outputs:
-            release-branch: ${{ steps.create-build-branch.outputs.branch }}
-        steps:
-            - name: Create branch
-              id: create-build-branch
-              run: |
-                  if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] 
-                  then
-                    echo "::set-output name=branch::${{ github.event.inputs.release-branch }}"
-                  else
-                    echo "::set-output name=branch::${{github.base_ref}}"
-                  fi
-
+                echo "${{github.base_ref}}"
+                git branch --all --list '*origin/release/20*' | sort -r | head -n 1 | cut -c18-
 
     create-pull-request-from-release-branch:
         runs-on: ubuntu-latest
         name: Create Release PR
-        needs: [generate-release-branch]
+        needs: [get-commit-diff]
+        if: ${{ needs.get-commit-diff.outputs.number_commit_diff == 0 && github.base_ref == needs.get-commit-diff.outputs.current_release_branch}}
         steps:
             - name: Checkout Repo
               uses: actions/checkout@master
               with:
                   fetch-depth: 0
                   persist-credentials: false
-                  ref: "${{ needs.generate-release-branch.outputs.release-branch }}"
+                  ref: "${{github.base_ref}}"
       
             - name: Create Pull Request
               id: cpr
@@ -74,10 +58,10 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.BUILD_GITHUB_TOKEN }}
               with:
-                  source_branch: "${{ needs.generate-release-branch.outputs.release-branch }}"
+                  source_branch: "${{github.base_ref}}"
                   destination_branch: "develop"
-                  pr_title: "[${{ github.event.inputs.jira-ticket-id }}] Release PR ${{needs.generate-release-branch.outputs.release-branch}}" # Title of pull request
-                  pr_body: "This PR is auto-generated for this week ${{needs.generate-release-branch.outputs.release-branch}}" # Full markdown support, requires pr_title to be set
+                  pr_title: "Release PR ${{github.base_ref}}" # Title of pull request
+                  pr_body: "This PR is auto-generated for this week ${{github.base_ref}}" # Full markdown support, requires pr_title to be set
                   pr_label: "release,automated,Ok to test" # Comma-separated list (no spaces)
                   pr_draft: true # Creates pull request as draft
                   pr_allow_empty: true # Creates pull request even if there are no changes
